@@ -1,0 +1,186 @@
+[
+    {
+        "source_column": "Business Proposal ID",
+        "target_field": "business_proposal_id",
+        "data_type": "Int",
+        "required": true,
+        "is_unique_identifier": true,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Main Contract ID",
+        "target_field": "main_contract_id",
+        "data_type": "Int",
+        "required": true,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Customer Reference",
+        "target_field": "customer_reference",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Business Proposal Date",
+        "target_field": "business_proposal_date",
+        "data_type": "Date",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Last Status Date",
+        "target_field": "last_status_date",
+        "data_type": "Date",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Funnel Percentage",
+        "target_field": "funnel_percentage",
+        "data_type": "String",
+        "required": true,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "R$ License of Use",
+        "target_field": "license_of_use",
+        "data_type": "Decimal",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    {
+        "source_column": "R$ Training",
+        "target_field": "training",
+        "data_type": "Decimal",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    {
+        "source_column": "R$ Monthly Fee",
+        "target_field": "monthly_fee",
+        "data_type": "Decimal",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    {
+        "source_column": "R$ Professional Services",
+        "target_field": "professional_services",
+        "data_type": "Decimal",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    {
+        "source_column": "Monthly Fee (Annualized)",
+        "target_field": "monthly_fee_annualized",
+        "data_type": "Decimal",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    {
+        "source_column": "R$ Total Sales",
+        "target_field": "total_sales",
+        "data_type": "Decimal",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    {
+        "source_column": "Last Note",
+        "target_field": "last_note",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Proposal Type Name",
+        "target_field": "proposal_type_name",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    {
+        "source_column": "Product Name",
+        "target_field": "product_name",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    {
+        "source_column": "Team Name",
+        "target_field": "team_name",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    {
+        "source_column": "Owner",
+        "target_field": "owner",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    {
+        "source_column": "Business Proposal Name",
+        "target_field": "business_proposal_name",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Recipient Name",
+        "target_field": "recipient_name",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Recipient E-mail",
+        "target_field": "recipient_email",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Business Proposal Status",
+        "target_field": "business_proposal_status",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Aging Business Proposal",
+        "target_field": "aging_business_proposal",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Aging Status",
+        "target_field": "aging_status",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    }
+]

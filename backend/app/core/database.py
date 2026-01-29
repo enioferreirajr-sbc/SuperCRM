@@ -1,8 +1,9 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
-from src.core.config import settings
+from app.core.config import settings
 
-from src.modules.proposals.models import BusinessProposal, BusinessProposalItem
+from app.features.proposals.models import BusinessProposal
+from app.features.importer.models import ImportDefinition, Proposal
 
 async def init_db():
     # Instantiate the client
@@ -16,6 +17,7 @@ async def init_db():
         database=client[settings.DATABASE_NAME],
         document_models=[
             BusinessProposal,
-            BusinessProposalItem
+            ImportDefinition,
+            Proposal
         ], 
     )
