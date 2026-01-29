@@ -1,5 +1,5 @@
 from typing import List, Dict, Any, Tuple, Optional
-from app.features.proposals.models import BusinessProposal
+from app.features.proposals.models import Proposal
 from pymongo import UpdateOne, InsertOne
 from pymongo.client_session import ClientSession
 from pymongo.client_session import ClientSession
@@ -13,26 +13,26 @@ class ProposalRepository:
         sort_order: int, 
         skip: int, 
         limit: int
-    ) -> Tuple[List[BusinessProposal], int]:
+    ) -> Tuple[List[Proposal], int]:
         """
         Fetches proposals with pagination, sorting, and filtering.
         Returns (items, total_count).
         """
         # Count total documents matching query
-        total_count = await BusinessProposal.find(query).count()
+        total_count = await Proposal.find(query).count()
         
         # Fetch page
-        cursor = BusinessProposal.find(query).sort((sort_field, sort_order)).skip(skip).limit(limit)
+        cursor = Proposal.find(query).sort((sort_field, sort_order)).skip(skip).limit(limit)
         items = await cursor.to_list()
         
         return items, total_count
 
     # @staticmethod
-    # async def fetch_items_by_proposal_id(proposal_id: int) -> List[BusinessProposalItem]:
+    # async def fetch_items_by_proposal_id(proposal_id: int) -> List[ProposalItem]:
     #    """
     #    Fetches all items linked to a specific proposal ID.
     #    """
-    #    return await BusinessProposalItem.find({"linked_proposal_id": proposal_id}).to_list()
+    #    return await ProposalItem.find({"linked_proposal_id": proposal_id}).to_list()
 
     @staticmethod
     async def get_metadata_aggregates() -> Dict[str, List[str]]:
@@ -41,14 +41,14 @@ class ProposalRepository:
         Optimized for performance.
         """
         # 1. Statuses (from Header)
-        statuses = await BusinessProposal.find_all().distinct("business_proposal_status")
+        statuses = await Proposal.find_all().distinct("business_proposal_status")
         
         # 2. Funnel Stages (from Header)
-        funnels = await BusinessProposal.find_all().distinct("funnel_percentage")
+        funnels = await Proposal.find_all().distinct("funnel_percentage")
         
         # 3. Products (from Items)
         # Embedded query: "items.product_name"
-        products = await BusinessProposal.find_all().distinct("items.product_name")
+        products = await Proposal.find_all().distinct("items.product_name")
         
         return {
             "products": sorted([p for p in products if p]),
@@ -66,7 +66,7 @@ class ProposalRepository:
         if not p_id: raise ValueError("Missing Proposal ID")
         
         # 1. Try to find existing
-        existing_doc = await BusinessProposal.find_one(BusinessProposal.business_proposal_id == p_id)
+        existing_doc = await Proposal.find_one(Proposal.business_proposal_id == p_id)
         
         if existing_doc:
             # 2. Update existing
@@ -83,9 +83,9 @@ class ProposalRepository:
             await existing_doc.save()
         else:
             # 3. Insert new
-            new_doc = BusinessProposal(**data)
+            new_doc = Proposal(**data)
             await new_doc.insert()
 
     @staticmethod
-    async def find_by_id(proposal_id: int) -> Optional[BusinessProposal]:
-        return await BusinessProposal.find_one({"business_proposal_id": proposal_id})
+    async def find_by_id(proposal_id: int) -> Optional[Proposal]:
+        return await Proposal.find_one({"business_proposal_id": proposal_id})

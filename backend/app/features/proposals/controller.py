@@ -1,6 +1,6 @@
 from typing import List, Optional
 from fastapi import APIRouter, UploadFile, File, HTTPException, Query
-from app.features.proposals.models import BusinessProposal
+from app.features.proposals.models import Proposal
 from app.features.proposals.schemas import PaginatedResponse, ProposalItemDTO, ImportResponse
 from app.features.proposals.service import get_all_proposals, get_proposal_items, import_proposals_from_excel, get_proposals_metadata
 

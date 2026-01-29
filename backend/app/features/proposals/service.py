@@ -11,7 +11,7 @@ from pymongo import UpdateOne
 from bson import Decimal128
 
 from app.core.constants import PROPOSAL_IMPORT_SCHEMA, parse_currency, parse_date
-from app.features.proposals.models import BusinessProposal, ProposalItem
+from app.features.proposals.models import Proposal, ProposalItem
 from app.features.proposals.schemas import (
     ProposalImportRow, 
     ProposalReadDTO, 
@@ -108,8 +108,7 @@ def _parse_excel_sync(content: bytes) -> Tuple[List[Dict[str, Any]], List[Import
                 "business_proposal_status": data.get("business_proposal_status"),
                 "last_note": data.get("last_note"),
                 "recipient_name": data.get("recipient_name"),
-                "recipient_e_mail": data.get("recipient_e_mail"),
-                "funnel_percentage_id": data.get("funnel_percentage_id"),
+                "recipient_email": data.get("recipient_e_mail"),
                 "aging_business_proposal": data.get("aging_business_proposal"),
                 "aging_status": data.get("aging_status"),
                 "total_value_aggregated": Decimal(0),
@@ -185,7 +184,7 @@ async def import_proposals_from_excel(file: UploadFile) -> ImportResponse:
                 p_id = p_data["business_proposal_id"]
                 
                 # Construct Document (Validate Pydantic)
-                # doc = BusinessProposal(**p_data) # This works for Insert, but for Updates we might want to be careful?
+                # doc = Proposal(**p_data) # This works for Insert, but for Updates we might want to be careful?
                 # Actually, replacing the whole document is cleaner for Import (Full Sync).
                 # But we need to match the ID.
                 
@@ -225,7 +224,7 @@ async def import_proposals_from_excel(file: UploadFile) -> ImportResponse:
 async def get_all_proposals(skip: int = 0, limit: int = 10, filters: Dict[str, Any] = None, sort_by: str = "business_proposal_id", sort_order: int = 1) -> PaginatedResponse:
     # ... (Keep existing logic but point to Repo? logic is already clean enough)
     # Just need to update the DTO mapping since Items are now embedded if we fetch them?
-    # This function fetches headers. `BusinessProposal` still has header fields.
+    # This function fetches headers. `Proposal` still has header fields.
     
     query = {}
     if filters:
