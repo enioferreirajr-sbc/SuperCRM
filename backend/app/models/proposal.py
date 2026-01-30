@@ -1,18 +1,23 @@
-from sqlalchemy import Date, Integer, Numeric, String
+from sqlalchemy import Date, Integer
+from sqlalchemy.dialects.mssql import NVARCHAR
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.models.base import Base
 
 
 class Proposal(Base):
-    __tablename__ = "proposals"
+    __tablename__ = "proposal"
 
-    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    proposal_id: Mapped[str] = mapped_column(String(50), unique=True, nullable=False)
-    customer_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    proposal_name: Mapped[str | None] = mapped_column(String(255), nullable=True)
-    status: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    closing_date: Mapped[Date | None] = mapped_column(Date, nullable=True)
-    total_value: Mapped[Numeric | None] = mapped_column(Numeric(18, 2), nullable=True)
+    proposal_id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)
+    main_contract_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    customer_reference: Mapped[str | None] = mapped_column(NVARCHAR(255), nullable=True)
+    proposal_name: Mapped[str | None] = mapped_column(NVARCHAR(255), nullable=True)
+    recipient_name: Mapped[str | None] = mapped_column(NVARCHAR(255), nullable=True)
+    recipient_email: Mapped[str | None] = mapped_column(NVARCHAR(255), nullable=True)
+    proposal_status: Mapped[str | None] = mapped_column(NVARCHAR(255), nullable=True)
+    business_proposal_date: Mapped[Date | None] = mapped_column(Date, nullable=True)
+    last_status_date: Mapped[Date | None] = mapped_column(Date, nullable=True)
+    funnel_percentage: Mapped[str] = mapped_column(NVARCHAR(100), nullable=False)
+    last_note: Mapped[str | None] = mapped_column(NVARCHAR(4000), nullable=True)
 
     details = relationship("ProposalDetail", back_populates="proposal", cascade="all, delete-orphan")

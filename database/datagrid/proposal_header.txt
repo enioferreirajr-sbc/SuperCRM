@@ -1,0 +1,52 @@
+# DTO — ProposalHeader (Modal)
+
+Representa os dados complementares da proposta exibidos no cabeçalho do modal.
+Esses dados dão contexto completo antes da visualização dos itens.
+
+## Campos
+
+- proposal_id
+  - Tipo: inteiro
+  - Origem: proposal.proposal_id
+
+- proposal_name
+  - Tipo: string
+  - Origem: proposal.proposal_name
+
+- customer_reference
+  - Tipo: string
+  - Origem: proposal.customer_reference
+
+- recipient_name
+  - Tipo: string
+  - Origem: proposal.recipient_name
+  - Descrição: Nome do contato principal do cliente.
+
+- recipient_email
+  - Tipo: string
+  - Origem: proposal.recipient_email
+
+- proposal_status
+  - Tipo: string
+  - Origem: proposal.proposal_status
+
+- business_proposal_date
+  - Tipo: date
+  - Origem: proposal.business_proposal_date
+  - Descrição: Data de criação da proposta.
+
+- last_status_date
+  - Tipo: date
+  - Origem: proposal.last_status_date
+  - Descrição: Última data de alteração de status.
+
+- last_note
+  - Tipo: string
+  - Origem: proposal.last_note
+  - Descrição: Observação mais recente associada à proposta.
+
+## Regras
+
+- Esses dados NÃO aparecem no grid principal.
+- São exibidos somente dentro do modal de detalhes.
+- Não incluem dados de itens ou valores agregados.

@@ -15,41 +15,30 @@ export const useImportProposals = () => {
         formData.append('file', file);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/proposals/import`, {
+            const response = await fetch(`${API_BASE_URL}/imports/proposals`, {
                 method: 'POST',
                 body: formData,
             });
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
 
             if (response.ok) {
-                // Determine success based on API status AND summary
-                // If we have errors but no rows upserted, it's a critical failure even if API returned 200
-                const { summary } = data;
-
-                if (summary && summary.errors_count > 0 && summary.proposals_upserted === 0) {
-                    const msg = 'A importação falhou. Verifique o registro de erros.';
-                    setError(msg);
-                    // We still return data so the modal can show the error table
+                if (data?.ok) {
+                    setSuccess('Importação concluída com sucesso.');
                     return data;
                 }
-
-                if (data.status === 'success' || data.status === 'completed_with_warnings') {
-                    setSuccess(`Importação finalizada. Verifique os resultados.`);
-                    return data;
-                } else {
-                    return data;
-                }
-            } else {
-                const msg = data.message || data.detail || 'Erro desconhecido na importação.';
+                const msg = data?.errors?.[0]?.message || 'A importação falhou.';
                 setError(msg);
-                return { status: 'error', message: msg, errors: [] };
+                return data;
             }
+            const msg = data?.message || data?.detail || data?.errors?.[0]?.message || 'Erro desconhecido na importação.';
+            setError(msg);
+            return { ok: false, errors: msg ? [{ message: msg }] : [] };
         } catch (err) {
             console.error(err);
             const msg = err.message || 'Erro ao conectar com o servidor.';
             setError(msg);
-            return { status: 'error', message: msg, errors: [] };
+            return { ok: false, errors: msg ? [{ message: msg }] : [] };
         } finally {
             setIsLoading(false);
         }

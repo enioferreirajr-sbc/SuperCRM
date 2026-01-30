@@ -1,0 +1,42 @@
+# DTO — ProposalGrid
+
+Representa os dados mínimos exibidos no DataGrid principal da tela de Propostas.
+O objetivo é permitir rápida identificação e decisão sobre qual proposta abrir.
+
+## Campos
+
+- proposal_id
+  - Tipo: inteiro
+  - Origem: proposal.proposal_id
+  - Descrição: Identificador único da proposta.
+  - Observação: Campo chave do grid.
+
+- customer_reference
+  - Tipo: string
+  - Origem: proposal.customer_reference
+  - Descrição: Nome de referência do cliente.
+  - Observação: Substitui qualquer conceito de "Customer Name".
+
+- proposal_name
+  - Tipo: string
+  - Origem: proposal.proposal_name
+  - Descrição: Nome completo da proposta.
+
+- funnel_percentage
+  - Tipo: string
+  - Origem: proposal.funnel_percentage
+  - Descrição: Etapa atual da proposta no funil de vendas.
+  - Exemplo: "Stage 02 - 50% - Keeping"
+  
+- total_value
+  - Tipo: decimal
+  - Origem: (O campo não existe na base de dados. O sistema deve somar o campo [proposal_detail].[total_sales] de todos os itens e apresentar nesse campo).
+  - Descrição: Valor Total.
+  - Exemplo: "R$ 54.985,45"
+
+## Regras
+
+- Nenhum outro campo deve aparecer no grid.
+- O grid não exibe dados financeiros.
+- O grid não exibe dados de contato.
+- Este DTO deve ser estável e raramente alterado.

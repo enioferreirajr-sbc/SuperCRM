@@ -4,7 +4,8 @@ import json
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy import select, update
+from sqlalchemy import insert, select, update
+from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
 from app.bootstrap.loader import validate_mapping_structure
@@ -67,54 +68,77 @@ def _fetch_active_records(session: Session, name: str) -> list[ImportMapping]:
     )
 
 
-def ensure_active_mapping(session: Session) -> None:
+def ensure_active_mapping(engine: Engine) -> None:
     name = DEFAULT_MAPPING_NAME
     version = DEFAULT_MAPPING_VERSION
 
-    active_records = _fetch_active_records(session, name)
-    if len(active_records) > 1:
-        raise RuntimeError(f"Multiple active mappings found for '{name}'.")
-    if active_records:
-        return
-
-    existing = (
-        session.execute(
-            select(ImportMapping).where(
-                ImportMapping.name == name,
-                ImportMapping.version == version,
+    table = ImportMapping.__table__
+    with engine.begin() as conn:
+        active_records = (
+            conn.execute(
+                select(table).where(
+                    table.c.name == name,
+                    table.c.is_active == True,
+                )
             )
+            .mappings()
+            .all()
         )
-        .scalars()
-        .first()
-    )
+        if len(active_records) > 1:
+            raise RuntimeError(f"Multiple active mappings found for '{name}'.")
+        if active_records:
+            return
 
-    try:
-        session.execute(
-            update(ImportMapping)
-            .where(ImportMapping.name == name)
+        existing = (
+            conn.execute(
+                select(table).where(
+                    table.c.name == name,
+                    table.c.version == version,
+                )
+            )
+            .mappings()
+            .first()
+        )
+
+        conn.execute(
+            update(table)
+            .where(table.c.name == name)
             .values(is_active=False)
         )
         if existing is None:
             mapping = load_bootstrap_mapping_json()
-            record = ImportMapping(
-                name=name,
-                version=version,
-                mapping_json=json.dumps(mapping),
-                is_active=True,
+            conn.execute(
+                insert(table).values(
+                    name=name,
+                    version=version,
+                    mapping_json=json.dumps(mapping),
+                    is_active=True,
+                )
             )
-            session.add(record)
         else:
-            existing.is_active = True
-        session.commit()
-    except Exception:
-        session.rollback()
-        raise
+            conn.execute(
+                update(table)
+                .where(
+                    table.c.name == name,
+                    table.c.version == version,
+                )
+                .values(is_active=True)
+            )
 
-    active_records = _fetch_active_records(session, name)
-    if not active_records:
-        raise RuntimeError(f"No active mapping found for '{name}'.")
-    if len(active_records) > 1:
-        raise RuntimeError(f"Multiple active mappings found for '{name}'.")
+        active_records = (
+            conn.execute(
+                select(table).where(
+                    table.c.name == name,
+                    table.c.is_active == True,
+                )
+            )
+            .mappings()
+            .all()
+        )
+        if not active_records:
+            raise RuntimeError(f"No active mapping found for '{name}'.")
+        if len(active_records) > 1:
+            raise RuntimeError(f"Multiple active mappings found for '{name}'.")
 
 
 def get_active_mapping(session: Session, name: str) -> dict:

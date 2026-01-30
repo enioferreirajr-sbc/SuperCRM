@@ -1,13 +1,10 @@
 import { useState, useMemo } from 'react';
 import {
-    EditNotificationsOutlined
-} from '@mui/icons-material';
-import {
     MaterialReactTable,
     useMaterialReactTable,
 } from 'material-react-table';
 import { MRT_Localization_PT_BR } from 'material-react-table/locales/pt-BR';
-import { Chip, Box, Alert, CircularProgress } from '@mui/material';
+import { Box, Alert } from '@mui/material';
 import useSWR from 'swr';
 import { NumericFormat } from 'react-number-format';
 import { API_BASE_URL } from '../../config/api';
@@ -15,39 +12,73 @@ import { API_BASE_URL } from '../../config/api';
 // --- Modal Component ---
 import { Dialog, DialogTitle, DialogContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, DialogActions, Typography, Grid } from '@mui/material';
 
-function ProposalDetailsModal({ open, onClose, proposal }) {
-    const { data: items, error } = useSWR(proposal ? `${API_BASE_URL}/proposals/${proposal.proposal_id}/items` : null, fetcher);
+const fetcher = async (url) => {
+    const res = await fetch(url);
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        const message = err?.message || err?.detail || 'Erro ao carregar dados.';
+        throw new Error(message);
+    }
+    return res.json();
+};
 
-    const isLoading = !items && !error;
+const formatDate = (value) => {
+    if (!value) return '-';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '-';
+    return date.toLocaleDateString('pt-BR');
+};
+
+function ProposalDetailsModal({ open, onClose, proposalId }) {
+    const { data: header, error: headerError } = useSWR(
+        proposalId ? `${API_BASE_URL}/proposals/${proposalId}` : null,
+        fetcher
+    );
+    const { data: items, error: itemsError } = useSWR(
+        proposalId ? `${API_BASE_URL}/proposals/${proposalId}/items` : null,
+        fetcher
+    );
+
+    const isLoading = !header && !headerError;
+    const isItemsLoading = !items && !itemsError;
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
-            <DialogTitle>Detalhes da Proposta #{proposal?.proposal_id}</DialogTitle>
+            <DialogTitle>Detalhes da Proposta #{proposalId}</DialogTitle>
             <DialogContent dividers>
                 {/* Header Info */}
                 <Grid container spacing={2} sx={{ mb: 2 }}>
                     <Grid item xs={12} sm={6}>
+                        <Typography variant="subtitle2" color="textSecondary">Nome da Proposta</Typography>
+                        <Typography variant="body1">{header?.proposal_name || '-'}</Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
                         <Typography variant="subtitle2" color="textSecondary">Cliente</Typography>
-                        <Typography variant="body1">{proposal?.client_name}</Typography>
+                        <Typography variant="body1">{header?.customer_reference || '-'}</Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <Typography variant="subtitle2" color="textSecondary">Probabilidade</Typography>
-                        <Typography variant="body1">{proposal?.probability}%</Typography>
+                        <Typography variant="subtitle2" color="textSecondary">Contato</Typography>
+                        <Typography variant="body1">{header?.recipient_name || '-'}</Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <Typography variant="subtitle2" color="textSecondary">Data Fechamento</Typography>
-                        <Typography variant="body1">
-                            {proposal?.closing_date ? new Date(proposal.closing_date).toLocaleDateString('pt-BR') : '-'}
-                        </Typography>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                        <Typography variant="subtitle2" color="textSecondary">Valor Total</Typography>
-                        <Typography variant="h6" color="primary">
-                            <NumericFormat value={proposal?.total_value || 0} displayType="text" thousandSeparator="." decimalSeparator="," prefix="R$ " />
-                        </Typography>
+                        <Typography variant="subtitle2" color="textSecondary">E-mail</Typography>
+                        <Typography variant="body1">{header?.recipient_email || '-'}</Typography>
                     </Grid>
                     <Grid item xs={12}>
-                        {proposal?.is_dirty && <Chip label="Editado Manualmente" color="warning" size="small" />}
+                        <Typography variant="subtitle2" color="textSecondary">Status</Typography>
+                        <Typography variant="body1">{header?.proposal_status || '-'}</Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <Typography variant="subtitle2" color="textSecondary">Data da Proposta</Typography>
+                        <Typography variant="body1">{formatDate(header?.business_proposal_date)}</Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                        <Typography variant="subtitle2" color="textSecondary">Data do Status</Typography>
+                        <Typography variant="body1">{formatDate(header?.last_status_date)}</Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Typography variant="subtitle2" color="textSecondary">Último Comentário</Typography>
+                        <Typography variant="body1">{header?.last_note || '-'}</Typography>
                     </Grid>
                 </Grid>
 
@@ -60,25 +91,47 @@ function ProposalDetailsModal({ open, onClose, proposal }) {
                                 <TableCell>Produto</TableCell>
                                 <TableCell>Tipo</TableCell>
                                 <TableCell>Time</TableCell>
-                                <TableCell align="right">Valor</TableCell>
+                                <TableCell>Responsável</TableCell>
+                                <TableCell align="right">Licença</TableCell>
+                                <TableCell align="right">Treinamento</TableCell>
+                                <TableCell align="right">Mensal</TableCell>
+                                <TableCell align="right">Consultoria</TableCell>
+                                <TableCell align="right">Mensal Anualizado</TableCell>
+                                <TableCell align="right">Total</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {isLoading ? (
-                                <TableRow><TableCell colSpan={4} align="center">Carregando itens...</TableCell></TableRow>
+                            {(isLoading || isItemsLoading) ? (
+                                <TableRow><TableCell colSpan={10} align="center">Carregando itens...</TableCell></TableRow>
                             ) : items?.length > 0 ? (
                                 items.map((item, index) => (
                                     <TableRow key={index}>
                                         <TableCell>{item.product_name}</TableCell>
-                                        <TableCell>{item.type_name}</TableCell>
+                                        <TableCell>{item.proposal_type_name}</TableCell>
                                         <TableCell>{item.team_name}</TableCell>
+                                        <TableCell>{item.owner}</TableCell>
                                         <TableCell align="right">
-                                            <NumericFormat value={item.value || 0} displayType="text" thousandSeparator="." decimalSeparator="," prefix="R$ " />
+                                            <NumericFormat value={item.license_of_use || 0} displayType="text" thousandSeparator="." decimalSeparator="," prefix="R$ " />
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <NumericFormat value={item.training || 0} displayType="text" thousandSeparator="." decimalSeparator="," prefix="R$ " />
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <NumericFormat value={item.monthly_fee || 0} displayType="text" thousandSeparator="." decimalSeparator="," prefix="R$ " />
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <NumericFormat value={item.professional_services || 0} displayType="text" thousandSeparator="." decimalSeparator="," prefix="R$ " />
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <NumericFormat value={item.monthly_fee_annualized || 0} displayType="text" thousandSeparator="." decimalSeparator="," prefix="R$ " />
+                                        </TableCell>
+                                        <TableCell align="right">
+                                            <NumericFormat value={item.total_sales || 0} displayType="text" thousandSeparator="." decimalSeparator="," prefix="R$ " />
                                         </TableCell>
                                     </TableRow>
                                 ))
                             ) : (
-                                <TableRow><TableCell colSpan={4} align="center">Nenhum item encontrado (ou erro ao carregar).</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={10} align="center">Nenhum item encontrado (ou erro ao carregar).</TableCell></TableRow>
                             )}
                         </TableBody>
                     </Table>
@@ -91,41 +144,28 @@ function ProposalDetailsModal({ open, onClose, proposal }) {
     );
 }
 
-const fetcher = (url) => fetch(url).then((res) => res.json());
-
 export default function ProposalsTable() {
     // MRT State
     const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
-    const [sorting, setSorting] = useState([]); // [{ id: 'name', desc: true }]
-    const [globalFilter, setGlobalFilter] = useState('');
 
     // Modal State
-    const [selectedProposal, setSelectedProposal] = useState(null);
+    const [selectedProposalId, setSelectedProposalId] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleOpenDetails = (row) => {
-        setSelectedProposal(row.original);
+        setSelectedProposalId(row.original.proposal_id);
         setIsModalOpen(true);
     };
 
     const handleCloseDetails = () => {
         setIsModalOpen(false);
-        setSelectedProposal(null);
+        setSelectedProposalId(null);
     };
 
     // Construct URL for SWR
-    const url = new URL(`${API_BASE_URL}/proposals/`);
+    const url = new URL(`${API_BASE_URL}/proposals`);
     url.searchParams.append('skip', (pagination.pageIndex * pagination.pageSize).toString());
     url.searchParams.append('limit', pagination.pageSize.toString());
-
-    if (sorting.length > 0) {
-        url.searchParams.append('sort_by', sorting[0].id);
-        url.searchParams.append('sort_order', sorting[0].desc ? 'desc' : 'asc');
-    }
-
-    if (globalFilter) {
-        url.searchParams.append('search', globalFilter);
-    }
 
     // Data Fetching
     const { data: apiData, error, isValidating } = useSWR(url.toString(), fetcher, {
@@ -144,38 +184,23 @@ export default function ProposalsTable() {
             header: 'ID', // Was proposal_id
             size: 90,
         },
-
-
-        // ... (inside columns definition)
         {
-            accessorKey: 'client_name', // Was client_name
+            accessorKey: 'customer_reference',
             header: 'Cliente',
             size: 150,
-            Cell: ({ cell, row }) => (
-                <Box display="flex" alignItems="center" gap={0.5}>
-                    {row.original.is_dirty && (
-                        <EditNotificationsOutlined
-                            color="warning"
-                            fontSize="small"
-                            titleAccess="Editado Manualmente"
-                        />
-                    )}
-                    <Typography variant="body2">{cell.getValue()}</Typography>
-                </Box>
-            ),
         },
         {
-            accessorKey: 'closing_date', // Was created_at
-            header: 'Data Fechamento',
+            accessorKey: 'proposal_name',
+            header: 'Nome Proposta',
+            size: 200,
+        },
+        {
+            accessorKey: 'funnel_percentage',
+            header: 'Etapa Funil',
             size: 150,
-            Cell: ({ cell }) => {
-                const val = cell.getValue();
-                if (!val) return '-';
-                return new Date(val).toLocaleDateString('pt-BR');
-            },
         },
         {
-            accessorKey: 'total_value', // Was total_value
+            accessorKey: 'total_value',
             header: 'Valor',
             size: 150,
             Cell: ({ cell }) => (
@@ -194,17 +219,6 @@ export default function ProposalsTable() {
                 align: 'right',
             }
         },
-        {
-            accessorKey: 'probability',
-            header: 'Prob. (%)',
-            size: 100,
-            Cell: ({ cell }) => (
-                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                    <Typography variant="body2">{cell.getValue()}%</Typography>
-                    {/* Add visual indicator if needed */}
-                </Box>
-            ),
-        }
     ], []);
 
     const table = useMaterialReactTable({
@@ -212,17 +226,11 @@ export default function ProposalsTable() {
         data: rows,
         enableColumnResizing: true,
         manualPagination: true,
-        manualSorting: true,
-        manualFiltering: true,
         rowCount: totalRowCount,
         onPaginationChange: setPagination,
-        onSortingChange: setSorting,
-        onGlobalFilterChange: setGlobalFilter,
         state: {
             isLoading,
             pagination,
-            sorting,
-            globalFilter,
             showProgressBars: isRefetching,
             showAlertBanner: isError,
         },
@@ -261,7 +269,7 @@ export default function ProposalsTable() {
             <ProposalDetailsModal
                 open={isModalOpen}
                 onClose={handleCloseDetails}
-                proposal={selectedProposal}
+                proposalId={selectedProposalId}
             />
         </>
     );

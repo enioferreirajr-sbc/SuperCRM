@@ -86,25 +86,25 @@
           "proposal_type_name": {
           "source": "Proposal Type Name",
           "type": "string",
-          "required": false,
+          "required": true,
           "length": 100
         },
           "product_name": {
           "source": "Product Name",
           "type": "string",
-          "required": false,
+          "required": true,
           "length": 100
         },
         "team_name": {
           "source": "Team Name",
           "type": "string",
-          "required": false,
+          "required": true,
           "length": 100
         },
         "owner": {
           "source": "Owner",
           "type": "string",
-          "required": false,
+          "required": true,
           "length": 100
         },
         "license_of_use": {
@@ -150,7 +150,7 @@
         "total_sales": {
           "source": "R$ Total Sales",
           "type": "decimal",
-          "required": false,
+          "required": true,
           "precision": 18,
           "scale": 2
         }
