@@ -9,6 +9,7 @@ from app.models.base import Base
 from app.models import proposal  # noqa: F401
 from app.models import proposal_detail  # noqa: F401
 from app.models import import_batch  # noqa: F401
+from app.models import import_mapping  # noqa: F401
 
 config = context.config
 

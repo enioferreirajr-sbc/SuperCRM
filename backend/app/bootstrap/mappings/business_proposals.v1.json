@@ -1,0 +1,211 @@
+{
+  "name": "business_proposals",
+  "version": "1.0.0",
+  "status": "bootstrap",
+  "description": "Mapping inicial de propostas comerciais. Usado para bootstrap do banco e como contrato base de importação.",
+  "source_type": "excel",
+  "fail_on_unknown_fields": true,
+
+  "entities": {
+    "Proposal": {
+      "table": "proposal",
+      "business_key": "proposal_id",
+      "columns": {
+        "proposal_id": {
+          "source": "Business Proposal ID",
+          "type": "int",
+          "required": true
+        },
+        "main_contract_id": {
+          "source": "Main Contract ID",
+          "type": "int",
+          "required": true
+        },
+        "customer_reference": {
+          "source": "Customer Reference",
+          "type": "string",
+          "required": false,
+          "length": 255
+        },
+        "business_proposal_date": {
+          "source": "Business Proposal Date",
+          "type": "date",
+          "required": false
+        },
+        "last_status_date": {
+          "source": "Last Status Date",
+          "type": "date",
+          "required": false
+        },
+        "funnel_percentage": {
+          "source": "Funnel Percentage",
+          "type": "string",
+          "required": true,
+          "length": 100
+        },
+        "last_note": {
+          "source": "Last Note",
+          "type": "string",
+          "required": false,
+          "length": 4000
+        }
+      }
+    },
+
+    "ProposalDetail": {
+      "table": "proposal_detail",
+      "parent": "Proposal",
+      "parent_key": "proposal_id",
+      "row_strategy": "one_row_per_excel_line",
+      "columns": {
+        "license_of_use": {
+          "source": "R$ License of Use",
+          "type": "decimal",
+          "required": false,
+          "precision": 18,
+          "scale": 2,
+          "default": 0
+        },
+        "training": {
+          "source": "R$ Training",
+          "type": "decimal",
+          "required": false,
+          "precision": 18,
+          "scale": 2,
+          "default": 0
+        },
+        "monthly_fee": {
+          "source": "R$ Monthly Fee",
+          "type": "decimal",
+          "required": false,
+          "precision": 18,
+          "scale": 2,
+          "default": 0
+        },
+        "professional_services": {
+          "source": "R$ Professional Services",
+          "type": "decimal",
+          "required": false,
+          "precision": 18,
+          "scale": 2,
+          "default": 0
+        },
+        "monthly_fee_annualized": {
+          "source": "Monthly Fee (Annualized)",
+          "type": "decimal",
+          "required": false,
+          "precision": 18,
+          "scale": 2,
+          "default": 0
+        },
+        "total_sales": {
+          "source": "R$ Total Sales",
+          "type": "decimal",
+          "required": true,
+          "precision": 18,
+          "scale": 2
+        }
+      }
+    }
+  },
+
+  "lookups": {
+    "Customer": {
+      "table": "customer",
+      "business_key": "main_contract_id",
+      "columns": {
+        "main_contract_id": {
+          "source": "Main Contract ID",
+          "type": "int",
+          "required": true
+        },
+        "customer_reference": {
+          "source": "Customer Reference",
+          "type": "string",
+          "required": false,
+          "length": 255
+        }
+      }
+    },
+    "CustomerRecipient": {
+      "table": "customer_recipient",
+      "parent": "Customer",
+      "parent_key": "main_contract_id",
+      "unique_by": ["main_contract_id", "recipient_email"],
+      "columns": {
+        "recipient_name": {
+          "source": "Recipient Name",
+          "type": "string",
+          "required": true,
+          "length": 255
+        },
+        "recipient_email": {
+          "source": "Recipient E-mail",
+          "type": "string",
+          "required": true,
+          "length": 255
+        },
+        "cellphone": {
+          "source": "Cellphone",
+          "type": "string",
+          "required": false,
+          "length": 50
+        }
+      }
+    },
+    "Product": {
+      "table": "product",
+      "business_key": "product_name",
+      "columns": {
+        "product_name": {
+          "source": "Product Name",
+          "type": "string",
+          "required": true,
+          "length": 150
+        }
+      }
+    },
+    "ProposalType": {
+      "table": "proposal_type",
+      "business_key": "proposal_type_name",
+      "columns": {
+        "proposal_type_name": {
+          "source": "Proposal Type Name",
+          "type": "string",
+          "required": true,
+          "length": 150
+        }
+      }
+    },
+    "Team": {
+      "table": "team",
+      "business_key": "team_name",
+      "columns": {
+        "team_name": {
+          "source": "Team Name",
+          "type": "string",
+          "required": true,
+          "length": 150
+        }
+      }
+    },
+    "Owner": {
+      "table": "owner",
+      "business_key": "owner_name",
+      "columns": {
+        "owner_name": {
+          "source": "Owner",
+          "type": "string",
+          "required": true,
+          "length": 150
+        }
+      }
+    }
+  },
+
+  "metadata": {
+    "created_by": "system",
+    "created_at": "bootstrap",
+    "notes": "Mapping bootstrap. Persistido em import_mappings. Importação real ocorre na Fase 3."
+  }
+}
