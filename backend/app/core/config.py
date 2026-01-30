@@ -1,18 +1,34 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import MongoDsn
+from dataclasses import dataclass
+from sqlalchemy.engine import URL
 
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(
-        env_file=".env",
-        env_ignore_empty=True,
-        extra="ignore"
-    )
 
-    MONGODB_URL: str = "mongodb://localhost:27017" # kept as str to avoid pydantic validation issues with motor if simple generic Dsn
-    # OR use MongoDsn and cast to str when using with motor. Let's use string for simplicity or str(MongoDsn)
-    # The requirement said MONGODB_URL: MongoDsn. Let's stick to that but handle string conversion if needed.
-    # Actually Motor accepts string. Pydantic MongoDsn might need 'str(settings.MONGODB_URL)' usage.
-    
-    DATABASE_NAME: str = "crm_db"
+@dataclass(frozen=True)
+class Settings:
+    server: str = r"localhost\\SQLEXPRESS"
+    database: str = "crm_db"
+    driver: str = "ODBC Driver 17 for SQL Server"
+
+    def sqlalchemy_url(self) -> str:
+        return URL.create(
+            "mssql+pyodbc",
+            host=self.server,
+            database=self.database,
+            query={
+                "driver": self.driver,
+                "Trusted_Connection": "yes",
+            },
+        ).render_as_string(hide_password=False)
+
+    def server_url(self) -> str:
+        return URL.create(
+            "mssql+pyodbc",
+            host=self.server,
+            database=None,
+            query={
+                "driver": self.driver,
+                "Trusted_Connection": "yes",
+            },
+        ).render_as_string(hide_password=False)
+
 
 settings = Settings()

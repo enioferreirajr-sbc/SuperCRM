@@ -1,48 +1,62 @@
-# SuperCRM Backend
+# SuperCRM Backend - Fase 1 (Infraestrutura)
 
-Backend desenvolvido em Python com FastAPI, MongoDB (Motor) e Beanie.
+Este backend fornece a base tecnica para o SuperCRM usando FastAPI + SQL Server.
 
-## Pré-requisitos
+## Requisitos
+- Python 3.11+
+- SQL Server local (SQLEXPRESS)
+- ODBC Driver 17 for SQL Server
+- Windows Authentication habilitada
 
-*   **Python 3.10+**
-*   **MongoDB** (rodando na porta 27017 por padrão)
+## Stack
+- FastAPI
+- SQLAlchemy 2.x
+- Alembic
+- pyodbc
 
-## Configuração do Ambiente
+## Como executar
+1) Criar ambiente virtual e instalar dependencias:
 
-1.  Crie e ative um ambiente virtual:
-    ```bash
-    # Windows
-    python -m venv venv
-    .\venv\Scripts\activate
-    ```
+   python -m venv venv
+   .\venv\Scripts\activate
+   pip install -r requirements.txt
 
-2.  Instale as dependências:
-    ```bash
-    pip install -r requirements.txt
-    ```
+2) Subir a API (cria o banco `crm_db` se nao existir e roda migrations):
 
-3.  Configure as variáveis de ambiente:
-    *   Certifique-se de que o arquivo `.env` existe na raiz do backend (já criado com configurações padrão).
-    *   Exemplo de `.env`:
-        ```env
-        MONGODB_URL=mongodb://localhost:27017
-        DATABASE_NAME=crm_db
-        ```
+   uvicorn app.main:app --reload
 
-## Executando a Aplicação (Hot Reload)
+3) Testar:
 
-Para iniciar o servidor com recarregamento automático (hot reload) habilitado (útil durante o desenvolvimento):
+   GET http://127.0.0.1:8000/health
+   Resposta esperada: {"status": "ok"}
 
-```bash
-uvicorn main:app --reload
-```
+## Banco de dados
+- Servidor: localhost\SQLEXPRESS
+- Banco: crm_db
+- Autenticacao: Windows Authentication
+- Driver: ODBC Driver 17 for SQL Server
 
-*   Acesse a API em: `http://localhost:8000`
-*   Documentação interativa (Swagger): `http://localhost:8000/docs`
+A aplicacao cria o banco automaticamente se nao existir e aplica as migrations no startup.
 
-## Scripts Úteis
+## Estrutura
+backend/
+  app/
+    main.py
+    core/
+      config.py
+      database.py
+    models/
+      base.py
+      proposal.py
+      proposal_detail.py
+      import_batch.py
+    api/
+      health.py
+    migrations/
+      env.py
+      versions/
+        0001_initial.py
 
-*   **Verificar Conexão com Banco de Dados:**
-    ```bash
-    python scripts/check_db_connection.py
-    ```
+## Observacoes
+- Esta fase nao implementa regras de negocio.
+- Nenhuma importacao, mapping ou leitura de Excel esta presente.

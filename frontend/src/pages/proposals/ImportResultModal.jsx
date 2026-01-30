@@ -108,7 +108,11 @@ export default function ImportResultModal({ open, onClose, result }) {
                                             <TableCell>{err.line_number > 0 ? err.line_number : '-'}</TableCell>
                                             <TableCell>{err.proposal_id || '-'}</TableCell>
                                             <TableCell>{err.column || '-'}</TableCell>
-                                            <TableCell sx={{ color: 'error.main' }}>{err.message}</TableCell>
+                                            <TableCell sx={{ color: 'error.main' }}>
+                                                {err.message.includes('Inexact')
+                                                    ? 'Valor numérico com precisão inválida (muitas casas decimais)'
+                                                    : err.message}
+                                            </TableCell>
                                         </TableRow>
                                     ))}
                                 </TableBody>

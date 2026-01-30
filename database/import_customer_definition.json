@@ -1,0 +1,35 @@
+[
+    {
+        "source_column": "Main Contract ID",
+        "target_field": "main_contract_id",
+        "data_type": "Int",
+        "required": true,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Customer Reference",
+        "target_field": "customer_reference",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "root"
+    },
+    {
+        "source_column": "Recipient Name",
+        "target_field": "recipient_name",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    {
+        "source_column": "Recipient E-mail",
+        "target_field": "recipient_email",
+        "data_type": "String",
+        "required": false,
+        "is_unique_identifier": false,
+        "target_location": "items"
+    },
+    
+]

@@ -1,0 +1,12 @@
+
+Collection: customer
+
+  "main_contract_id": 42536,
+  "customer_reference": "Goiasa",
+  "items": [
+    {
+      "recipient_name": "Time Attendance",
+      "recipient_email": "Consulting (Professional Services)",
+	  "cellphone": "+55 (11) 98700-1137"
+      }
+  ]

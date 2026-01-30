@@ -1,8 +1,5 @@
 import { useState } from 'react';
-
-// Set base URL for API (assuming standard Vite proxy or specific URL)
-// If you have a global axios instance, use that. For now using default.
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+import { API_BASE_URL } from '../config/api';
 
 export const useImportProposals = () => {
     const [isLoading, setIsLoading] = useState(false);
@@ -18,35 +15,41 @@ export const useImportProposals = () => {
         formData.append('file', file);
 
         try {
-            const response = await fetch(`${API_URL}/proposals/import`, {
+            const response = await fetch(`${API_BASE_URL}/proposals/import`, {
                 method: 'POST',
                 body: formData,
-                // Do NOT set Content-Type header for FormData, browser sets it with boundary
             });
 
             const data = await response.json();
 
             if (response.ok) {
-                // Determine success based on API status
+                // Determine success based on API status AND summary
+                // If we have errors but no rows upserted, it's a critical failure even if API returned 200
+                const { summary } = data;
+
+                if (summary && summary.errors_count > 0 && summary.proposals_upserted === 0) {
+                    const msg = 'A importação falhou. Verifique o registro de erros.';
+                    setError(msg);
+                    // We still return data so the modal can show the error table
+                    return data;
+                }
+
                 if (data.status === 'success' || data.status === 'completed_with_warnings') {
                     setSuccess(`Importação finalizada. Verifique os resultados.`);
                     return data;
                 } else {
-                    // Logic for explicit "failed" status inside 200 OK (if design permits, but usually failed is 400)
-                    // Our API returns 'failed' with 200 if parsed but rejected? No, we likely want to just pass it through.
-                    // Let's just pass data if response is OK, letting UI decide.
                     return data;
                 }
             } else {
                 const msg = data.message || data.detail || 'Erro desconhecido na importação.';
                 setError(msg);
-                return { status: 'error', message: msg };
+                return { status: 'error', message: msg, errors: [] };
             }
         } catch (err) {
             console.error(err);
             const msg = err.message || 'Erro ao conectar com o servidor.';
             setError(msg);
-            return { status: 'error', message: msg };
+            return { status: 'error', message: msg, errors: [] };
         } finally {
             setIsLoading(false);
         }

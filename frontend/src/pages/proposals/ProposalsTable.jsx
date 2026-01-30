@@ -1,33 +1,22 @@
 import { useState, useMemo } from 'react';
 import {
+    EditNotificationsOutlined
+} from '@mui/icons-material';
+import {
     MaterialReactTable,
     useMaterialReactTable,
 } from 'material-react-table';
 import { MRT_Localization_PT_BR } from 'material-react-table/locales/pt-BR';
-import { Chip, Box } from '@mui/material';
+import { Chip, Box, Alert, CircularProgress } from '@mui/material';
 import useSWR from 'swr';
 import { NumericFormat } from 'react-number-format';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-
-const statusColorMap = {
-    'Won': 'success',
-    'Lost': 'error',
-    'Open': 'primary',
-    'Draft': 'warning',
-    'Submitted': 'info'
-};
-
-function StatusChip({ status }) {
-    const color = statusColorMap[status] || 'default';
-    return <Chip label={status || 'Unknown'} color={color} size="small" variant="light" />;
-}
+import { API_BASE_URL } from '../../config/api';
 
 // --- Modal Component ---
 import { Dialog, DialogTitle, DialogContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, DialogActions, Typography, Grid } from '@mui/material';
 
 function ProposalDetailsModal({ open, onClose, proposal }) {
-    const { data: items, error } = useSWR(proposal ? `${API_URL}/proposals/${proposal.proposal_id}/items` : null, fetcher);
+    const { data: items, error } = useSWR(proposal ? `${API_BASE_URL}/proposals/${proposal.proposal_id}/items` : null, fetcher);
 
     const isLoading = !items && !error;
 
@@ -42,18 +31,23 @@ function ProposalDetailsModal({ open, onClose, proposal }) {
                         <Typography variant="body1">{proposal?.client_name}</Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <Typography variant="subtitle2" color="textSecondary">Status</Typography>
-                        <StatusChip status={proposal?.status} />
+                        <Typography variant="subtitle2" color="textSecondary">Probabilidade</Typography>
+                        <Typography variant="body1">{proposal?.probability}%</Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <Typography variant="subtitle2" color="textSecondary">Funil</Typography>
-                        <Typography variant="body1">{proposal?.funnel_stage}</Typography>
+                        <Typography variant="subtitle2" color="textSecondary">Data Fechamento</Typography>
+                        <Typography variant="body1">
+                            {proposal?.closing_date ? new Date(proposal.closing_date).toLocaleDateString('pt-BR') : '-'}
+                        </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
-                        <Typography variant="subtitle2" color="textSecondary">Total (Agregado)</Typography>
+                        <Typography variant="subtitle2" color="textSecondary">Valor Total</Typography>
                         <Typography variant="h6" color="primary">
                             <NumericFormat value={proposal?.total_value || 0} displayType="text" thousandSeparator="." decimalSeparator="," prefix="R$ " />
                         </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        {proposal?.is_dirty && <Chip label="Editado Manualmente" color="warning" size="small" />}
                     </Grid>
                 </Grid>
 
@@ -84,7 +78,7 @@ function ProposalDetailsModal({ open, onClose, proposal }) {
                                     </TableRow>
                                 ))
                             ) : (
-                                <TableRow><TableCell colSpan={4} align="center">Nenhum item encontrado.</TableCell></TableRow>
+                                <TableRow><TableCell colSpan={4} align="center">Nenhum item encontrado (ou erro ao carregar).</TableCell></TableRow>
                             )}
                         </TableBody>
                     </Table>
@@ -120,7 +114,7 @@ export default function ProposalsTable() {
     };
 
     // Construct URL for SWR
-    const url = new URL(`${API_URL}/proposals/`);
+    const url = new URL(`${API_BASE_URL}/proposals/`);
     url.searchParams.append('skip', (pagination.pageIndex * pagination.pageSize).toString());
     url.searchParams.append('limit', pagination.pageSize.toString());
 
@@ -147,41 +141,42 @@ export default function ProposalsTable() {
     const columns = useMemo(() => [
         {
             accessorKey: 'proposal_id',
-            header: 'ID',
+            header: 'ID', // Was proposal_id
             size: 90,
         },
+
+
+        // ... (inside columns definition)
         {
-            accessorKey: 'proposal_name',
-            header: 'Nome da Proposta',
-            size: 250,
-        },
-        {
-            accessorKey: 'client_name',
+            accessorKey: 'client_name', // Was client_name
             header: 'Cliente',
             size: 150,
-        },
-        // Product Column Removed for Consolidated View
-        {
-            accessorKey: 'funnel_stage',
-            header: 'Funil',
-            size: 150,
-            Cell: ({ cell }) => (
-                <Chip
-                    label={cell.getValue() || 'N/A'}
-                    size="small"
-                    variant="outlined"
-                    sx={{
-                        borderColor: 'primary.main',
-                        color: 'primary.main',
-                        fontSize: '0.75rem',
-                        height: 24
-                    }}
-                />
+            Cell: ({ cell, row }) => (
+                <Box display="flex" alignItems="center" gap={0.5}>
+                    {row.original.is_dirty && (
+                        <EditNotificationsOutlined
+                            color="warning"
+                            fontSize="small"
+                            titleAccess="Editado Manualmente"
+                        />
+                    )}
+                    <Typography variant="body2">{cell.getValue()}</Typography>
+                </Box>
             ),
         },
         {
-            accessorKey: 'total_value',
-            header: 'Valor Total',
+            accessorKey: 'closing_date', // Was created_at
+            header: 'Data Fechamento',
+            size: 150,
+            Cell: ({ cell }) => {
+                const val = cell.getValue();
+                if (!val) return '-';
+                return new Date(val).toLocaleDateString('pt-BR');
+            },
+        },
+        {
+            accessorKey: 'total_value', // Was total_value
+            header: 'Valor',
             size: 150,
             Cell: ({ cell }) => (
                 <NumericFormat
@@ -200,25 +195,25 @@ export default function ProposalsTable() {
             }
         },
         {
-            accessorKey: 'status',
-            header: 'Status',
-            size: 120,
-            Cell: ({ cell }) => <StatusChip status={cell.getValue()} />,
-            muiTableHeadCellProps: {
-                align: 'center',
-            },
-            muiTableBodyCellProps: {
-                align: 'center',
-            }
-        },
+            accessorKey: 'probability',
+            header: 'Prob. (%)',
+            size: 100,
+            Cell: ({ cell }) => (
+                <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                    <Typography variant="body2">{cell.getValue()}%</Typography>
+                    {/* Add visual indicator if needed */}
+                </Box>
+            ),
+        }
     ], []);
 
     const table = useMaterialReactTable({
         columns,
         data: rows,
+        enableColumnResizing: true,
         manualPagination: true,
         manualSorting: true,
-        manualFiltering: true, // We use global filter as the main search
+        manualFiltering: true,
         rowCount: totalRowCount,
         onPaginationChange: setPagination,
         onSortingChange: setSorting,
@@ -231,10 +226,6 @@ export default function ProposalsTable() {
             showProgressBars: isRefetching,
             showAlertBanner: isError,
         },
-        localization: MRT_Localization_PT_BR,
-        enableRowStriping: true,
-        enableColumnBorders: true,
-        enableRowActions: true,
         renderRowActions: ({ row }) => (
             <Button size="small" variant="outlined" onClick={() => handleOpenDetails(row)}>
                 Detalhes
@@ -242,30 +233,26 @@ export default function ProposalsTable() {
         ),
         muitablePaperProps: {
             sx: {
-                // Remove shadow if needed or keep default
                 boxShadow: 'none',
                 border: '1px solid',
                 borderColor: 'divider',
             }
         },
-        muiTableHeadCellProps: {
-            sx: {
-                backgroundColor: (theme) => theme.palette.mode === 'light' ? theme.palette.grey[200] : theme.palette.grey[800],
-                fontWeight: 'bold',
-                borderBottom: '1px solid',
-                borderColor: 'divider',
-            },
-        },
-        muiTableBodyCellProps: {
-            sx: {
-                borderRight: '1px solid',
-                borderColor: 'divider',
-            },
-        },
+        localization: MRT_Localization_PT_BR,
+        enableRowStriping: true,
+        enableColumnBorders: true,
+        enableRowActions: true,
     });
 
     if (isError) {
-        return <Box p={2}>Erro ao carregar dados.</Box>;
+        console.error("ProposalsTable Fetch Error:", error);
+        return (
+            <Box display="flex" justifyContent="center" p={2}>
+                <Alert severity="error" sx={{ width: '100%', maxWidth: 600 }}>
+                    Erro ao carregar dados: {error?.message || 'Falha na conexão com o servidor'}
+                </Alert>
+            </Box>
+        );
     }
 
     return (
