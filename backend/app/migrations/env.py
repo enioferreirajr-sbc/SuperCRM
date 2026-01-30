@@ -10,6 +10,12 @@ from app.models import proposal  # noqa: F401
 from app.models import proposal_detail  # noqa: F401
 from app.models import import_batch  # noqa: F401
 from app.models import import_mapping  # noqa: F401
+from app.models import customer  # noqa: F401
+from app.models import customer_recipient  # noqa: F401
+from app.models import product  # noqa: F401
+from app.models import proposal_type  # noqa: F401
+from app.models import team  # noqa: F401
+from app.models import owner  # noqa: F401
 
 config = context.config
 
