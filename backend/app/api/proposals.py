@@ -10,6 +10,11 @@ from app.models.proposal_detail import ProposalDetail
 from app.schemas.proposal_grid import ProposalGridDTO
 from app.schemas.proposal_header import ProposalHeaderDTO
 from app.schemas.proposal_detail_item import ProposalDetailItemDTO
+from app.schemas.proposal_details import (
+    ProposalDetailsDTO,
+    ProposalDetailsHeaderDTO,
+    ProposalDetailsItemDTO,
+)
 
 router = APIRouter(prefix="/api/v1", tags=["proposals"])
 
@@ -86,6 +91,58 @@ def get_proposal_header(
         last_note=proposal.last_note,
     )
     return asdict(header)
+
+
+@router.get("/proposals/{proposal_id}/details")
+def get_proposal_details(
+    proposal_id: int,
+    session: Session = Depends(get_db),
+):
+    proposal = (
+        session.execute(select(Proposal).where(Proposal.proposal_id == proposal_id))
+        .scalars()
+        .first()
+    )
+    if proposal is None:
+        raise HTTPException(status_code=404, detail="Proposal not found.")
+
+    items = (
+        session.execute(
+            select(ProposalDetail).where(ProposalDetail.proposal_id == proposal_id)
+        )
+        .scalars()
+        .all()
+    )
+
+    header = ProposalDetailsHeaderDTO(
+        proposal_id=proposal.proposal_id,
+        proposal_name=proposal.proposal_name,
+        funnel_percentage=proposal.funnel_percentage,
+        customer_reference=proposal.customer_reference,
+        recipient_name=proposal.recipient_name,
+        recipient_email=proposal.recipient_email,
+        proposal_status=proposal.proposal_status,
+        business_proposal_date=proposal.business_proposal_date,
+        last_status_date=proposal.last_status_date,
+        last_note=proposal.last_note,
+    )
+
+    detail_items = [
+        ProposalDetailsItemDTO(
+            product_name=item.product_name,
+            proposal_type_name=item.proposal_type_name,
+            team_name=item.team_name,
+            owner=item.owner,
+            total_sales=item.total_sales,
+        )
+        for item in items
+    ]
+
+    details = ProposalDetailsDTO(
+        proposal=header,
+        items=detail_items,
+    )
+    return asdict(details)
 
 
 @router.get("/proposals/{proposal_id}/items")
