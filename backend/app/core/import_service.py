@@ -56,6 +56,9 @@ def import_proposals_from_excel(
         return asdict(report)
 
     mapping = get_active_mapping(session, DEFAULT_MAPPING_NAME)
+    # encerra transação implícita aberta apenas por SELECTs
+    if session.in_transaction() and not session.new and not session.dirty:
+        session.rollback()
     ctx = build_context(rows, mapping, session)
     report = validate_context(ctx)
 
