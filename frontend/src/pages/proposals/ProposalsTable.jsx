@@ -8,9 +8,10 @@ import { Box, Alert } from '@mui/material';
 import useSWR from 'swr';
 import { NumericFormat } from 'react-number-format';
 import { API_BASE_URL } from '../../config/api';
+import MoreVert from '@mui/icons-material/MoreVert';
 
 // --- Modal Component ---
-import { Dialog, DialogTitle, DialogContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, DialogActions, Typography, Grid } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Button, DialogActions, Typography, Grid, MenuItem } from '@mui/material';
 
 const fetcher = async (url) => {
     const res = await fetch(url);
@@ -162,6 +163,10 @@ export default function ProposalsTable() {
         setSelectedProposalId(null);
     };
 
+    const handleChangeFunnelStatus = (row) => {
+        console.info('Alterar status do funil:', row.original.proposal_id);
+    };
+
     // Construct URL for SWR
     const url = new URL(`${API_BASE_URL}/proposals`);
     url.searchParams.append('skip', (pagination.pageIndex * pagination.pageSize).toString());
@@ -182,27 +187,33 @@ export default function ProposalsTable() {
         {
             accessorKey: 'proposal_id',
             header: 'ID', // Was proposal_id
-            size: 90,
+            size: 80,
+            minSize: 80,
+            maxSize: 100,
         },
         {
             accessorKey: 'customer_reference',
             header: 'Cliente',
-            size: 150,
+            minSize: 160,
+            flex: 1,
         },
         {
             accessorKey: 'proposal_name',
             header: 'Nome Proposta',
-            size: 200,
+            minSize: 220,
+            flex: 2,
         },
         {
             accessorKey: 'funnel_percentage',
             header: 'Etapa Funil',
-            size: 150,
+            minSize: 140,
+            flex: 1,
         },
         {
             accessorKey: 'total_value',
             header: 'Valor',
-            size: 150,
+            minSize: 140,
+            flex: 1,
             Cell: ({ cell }) => (
                 <NumericFormat
                     value={cell.getValue() || 0}
@@ -234,11 +245,41 @@ export default function ProposalsTable() {
             showProgressBars: isRefetching,
             showAlertBanner: isError,
         },
-        renderRowActions: ({ row }) => (
-            <Button size="small" variant="outlined" onClick={() => handleOpenDetails(row)}>
-                Detalhes
-            </Button>
-        ),
+        renderRowActionMenuItems: ({ row, closeMenu }) => [
+            <MenuItem
+                key="view-details"
+                onClick={() => {
+                    handleOpenDetails(row);
+                    closeMenu();
+                }}
+            >
+                Ver detalhes
+            </MenuItem>,
+            <MenuItem
+                key="change-funnel-status"
+                onClick={() => {
+                    handleChangeFunnelStatus(row);
+                    closeMenu();
+                }}
+            >
+                Alterar status do funil
+            </MenuItem>,
+        ],
+        displayColumnDefOptions: {
+            'mrt-row-actions': {
+                header: 'Ações',
+                size: 56,
+                minSize: 56,
+                maxSize: 56,
+                enableResizing: false,
+                muiTableHeadCellProps: {
+                    align: 'center',
+                },
+                muiTableBodyCellProps: {
+                    align: 'center',
+                },
+            },
+        },
         muitablePaperProps: {
             sx: {
                 boxShadow: 'none',
@@ -250,6 +291,9 @@ export default function ProposalsTable() {
         enableRowStriping: true,
         enableColumnBorders: true,
         enableRowActions: true,
+        icons: {
+            MoreHorizIcon: MoreVert,
+        },
     });
 
     if (isError) {
