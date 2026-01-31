@@ -147,16 +147,15 @@ export default function ProposalsTable() {
 
     // Modal State
     const [selectedProposalId, setSelectedProposalId] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-    const handleOpenDetails = (row) => {
+    const handleOpenProposalDetails = (row) => {
         setSelectedProposalId(row.original.proposal_id);
-        setIsModalOpen(true);
+        setIsDetailsModalOpen(true);
     };
 
     const handleCloseDetails = () => {
-        setIsModalOpen(false);
-        setSelectedProposalId(null);
+        setIsDetailsModalOpen(false);
     };
 
     const handleChangeFunnelStatus = (row) => {
@@ -246,11 +245,11 @@ export default function ProposalsTable() {
             <MenuItem
                 key="view-details"
                 onClick={() => {
-                    handleOpenDetails(row);
+                    handleOpenProposalDetails(row);
                     closeMenu();
                 }}
             >
-                Ver detalhes
+                Detalhes
             </MenuItem>,
             <MenuItem
                 key="change-funnel-status"
@@ -308,7 +307,7 @@ export default function ProposalsTable() {
         <>
             <MaterialReactTable table={table} />
             <ProposalDetailsModal
-                open={isModalOpen}
+                open={isDetailsModalOpen}
                 onClose={handleCloseDetails}
                 proposalId={selectedProposalId}
             />
