@@ -187,33 +187,37 @@ export default function ProposalsTable() {
         {
             accessorKey: 'proposal_id',
             header: 'ID', // Was proposal_id
-            size: 80,
-            minSize: 80,
-            maxSize: 100,
+            size: 90,
+            minSize: 90,
+            maxSize: 90,
         },
         {
             accessorKey: 'customer_reference',
             header: 'Cliente',
+            size: 160,
             minSize: 160,
-            flex: 1,
+            maxSize: 160,
         },
         {
             accessorKey: 'proposal_name',
             header: 'Nome Proposta',
-            minSize: 220,
-            flex: 2,
+            size: 420,
+            minSize: 420,
+            maxSize: 420,
         },
         {
             accessorKey: 'funnel_percentage',
             header: 'Etapa Funil',
-            minSize: 140,
-            flex: 1,
+            size: 260,
+            minSize: 260,
+            maxSize: 260,
         },
         {
             accessorKey: 'total_value',
             header: 'Valor',
+            size: 140,
             minSize: 140,
-            flex: 1,
+            maxSize: 140,
             Cell: ({ cell }) => (
                 <NumericFormat
                     value={cell.getValue() || 0}
@@ -268,9 +272,9 @@ export default function ProposalsTable() {
         displayColumnDefOptions: {
             'mrt-row-actions': {
                 header: 'Ações',
-                size: 56,
-                minSize: 56,
-                maxSize: 56,
+                size: 72,
+                minSize: 72,
+                maxSize: 72,
                 enableResizing: false,
                 muiTableHeadCellProps: {
                     align: 'center',
@@ -291,6 +295,7 @@ export default function ProposalsTable() {
         enableRowStriping: true,
         enableColumnBorders: true,
         enableRowActions: true,
+        positionActionsColumn: 'first',
         icons: {
             MoreHorizIcon: MoreVert,
         },
