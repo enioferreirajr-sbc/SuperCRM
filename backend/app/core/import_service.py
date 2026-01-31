@@ -56,11 +56,11 @@ def import_proposals_from_excel(
         return asdict(report)
 
     mapping = get_active_mapping(session, DEFAULT_MAPPING_NAME)
-    ctx = build_context(rows, mapping)
+    ctx = build_context(rows, mapping, session)
     report = validate_context(ctx)
 
     if validate_only or not report.ok:
         return asdict(report)
 
-    report = execute_import(ctx, session)
+    report = execute_import(ctx)
     return asdict(report)

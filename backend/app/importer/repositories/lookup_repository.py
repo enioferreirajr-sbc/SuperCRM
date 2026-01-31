@@ -1,110 +1,139 @@
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Any
 
 import sqlalchemy as sa
-from sqlalchemy.orm import Session
 
+from app.core.import_context import ImportContext
+from app.importer.utils.normalization import is_empty
 from app.models.customer import Customer
 from app.models.customer_recipient import CustomerRecipient
+from app.models.owner import Owner
+from app.models.product import Product
+from app.models.proposal_type import ProposalType
+from app.models.team import Team
 
 
-def insert_customers(session: Session, customers: dict[int, dict]) -> int:
-    if not customers:
-        return 0
-    customer_ids = list(customers.keys())
-    existing = set(
-        session.execute(
-            sa.select(Customer.main_contract_id).where(
-                Customer.main_contract_id.in_(customer_ids)
+def _normalize_text(value: Any) -> str | None:
+    if is_empty(value):
+        return None
+    text = str(value).strip()
+    return text or None
+
+
+def get_or_create_customer(
+    ctx: ImportContext,
+    main_contract_id: int | None,
+    customer_reference: str | None = None,
+) -> Customer | None:
+    if is_empty(main_contract_id):
+        return None
+    contract_id = int(main_contract_id)
+    if contract_id in ctx.customers:
+        return ctx.customers[contract_id]
+
+    customer = (
+        ctx.session.execute(
+            sa.select(Customer).distinct().where(Customer.main_contract_id == contract_id)
+        )
+        .scalars()
+        .first()
+    )
+    if customer is None:
+        customer = Customer(
+            main_contract_id=contract_id,
+            customer_reference=_normalize_text(customer_reference),
+        )
+        ctx.session.add(customer)
+
+    ctx.customers[contract_id] = customer
+    return customer
+
+
+def get_or_create_customer_recipient(
+    ctx: ImportContext,
+    main_contract_id: int | None,
+    recipient_email: str | None,
+    recipient_name: str | None = None,
+    cellphone: str | None = None,
+) -> CustomerRecipient | None:
+    if is_empty(main_contract_id) or is_empty(recipient_email):
+        return None
+    contract_id = int(main_contract_id)
+    email = str(recipient_email).strip()
+    if not email:
+        return None
+
+    key = (contract_id, email)
+    if key in ctx.recipients:
+        return ctx.recipients[key]
+
+    recipient = (
+        ctx.session.execute(
+            sa.select(CustomerRecipient)
+            .distinct()
+            .where(
+                CustomerRecipient.main_contract_id == contract_id,
+                CustomerRecipient.recipient_email == email,
             )
         )
         .scalars()
-        .all()
+        .first()
     )
-    inserted = 0
-    for customer_id, data in customers.items():
-        if customer_id in existing:
-            continue
-        session.add(
-            Customer(
-                main_contract_id=data["main_contract_id"],
-                customer_reference=data.get("customer_reference"),
-            )
+    if recipient is None:
+        name = _normalize_text(recipient_name)
+        if name is None:
+            return None
+        recipient = CustomerRecipient(
+            main_contract_id=contract_id,
+            recipient_email=email,
+            recipient_name=name,
+            cellphone=_normalize_text(cellphone),
         )
-        inserted += 1
-    return inserted
+        ctx.session.add(recipient)
+
+    ctx.recipients[key] = recipient
+    return recipient
 
 
-def insert_customer_recipients(
-    session: Session, recipients: dict[tuple[int, str], dict]
-) -> int:
-    if not recipients:
-        return 0
-
-    keys = list(recipients.keys())
-    incoming_rows = [
-        sa.select(
-            sa.literal(key[0]).label("main_contract_id"),
-            sa.literal(key[1]).label("recipient_email"),
-        )
-        for key in keys
-    ]
-    if len(incoming_rows) == 1:
-        incoming = incoming_rows[0].subquery()
-    else:
-        incoming = sa.union_all(*incoming_rows).subquery()
-
-    existing = set(
-        session.execute(
-            sa.select(
-                CustomerRecipient.main_contract_id,
-                CustomerRecipient.recipient_email,
-            ).select_from(
-                CustomerRecipient.__table__.join(
-                    incoming,
-                    sa.and_(
-                        CustomerRecipient.main_contract_id == incoming.c.main_contract_id,
-                        CustomerRecipient.recipient_email == incoming.c.recipient_email,
-                    ),
-                )
-            )
-        ).all()
-    )
-
-    inserted = 0
-    for key, data in recipients.items():
-        if key in existing:
-            continue
-        session.add(
-            CustomerRecipient(
-                main_contract_id=data["main_contract_id"],
-                recipient_email=data["recipient_email"],
-                recipient_name=data.get("recipient_name"),
-                cellphone=data.get("cellphone"),
-            )
-        )
-        inserted += 1
-    return inserted
-
-
-def insert_named_values(
-    session: Session,
+def _get_or_create_named(
+    ctx: ImportContext,
+    cache: dict[str, Any],
     model: type,
     field_name: str,
-    values: Iterable[str],
-) -> int:
-    values_set = {value for value in values if value is not None and str(value).strip()}
-    if not values_set:
-        return 0
+    value: str | None,
+):
+    name = _normalize_text(value)
+    if name is None:
+        return None
+    if name in cache:
+        return cache[name]
+
     field = getattr(model, field_name)
-    existing = set(
-        session.execute(sa.select(field).where(field.in_(values_set))).scalars().all()
+    existing = (
+        ctx.session.execute(sa.select(model).distinct().where(field == name))
+        .scalars()
+        .first()
     )
-    inserted = 0
-    for value in values_set:
-        if value in existing:
-            continue
-        session.add(model(**{field_name: value}))
-        inserted += 1
-    return inserted
+    if existing is None:
+        existing = model(**{field_name: name})
+        ctx.session.add(existing)
+
+    cache[name] = existing
+    return existing
+
+
+def get_or_create_product(ctx: ImportContext, name: str | None) -> Product | None:
+    return _get_or_create_named(ctx, ctx.products, Product, "product_name", name)
+
+
+def get_or_create_proposal_type(ctx: ImportContext, name: str | None) -> ProposalType | None:
+    return _get_or_create_named(ctx, ctx.proposal_types, ProposalType, "proposal_type_name", name)
+
+
+def get_or_create_team(ctx: ImportContext, name: str | None) -> Team | None:
+    return _get_or_create_named(ctx, ctx.teams, Team, "team_name", name)
+
+
+def get_or_create_owner(ctx: ImportContext, name: str | None) -> Owner | None:
+    return _get_or_create_named(ctx, ctx.owners, Owner, "owner_name", name)

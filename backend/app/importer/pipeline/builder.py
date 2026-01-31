@@ -2,7 +2,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.importer.context.import_context import ImportContext, RawRow
+from sqlalchemy.orm import Session
+
+from app.core.import_context import ImportContext, RawRow
 from app.importer.contracts.mapping_contract import (
     get_entity_columns,
     get_lookup_columns,
@@ -39,8 +41,12 @@ def _normalize_value(value: Any, spec: dict[str, Any], *, for_email: bool = Fals
     return raw_value
 
 
-def build_context(rows: list[dict[str, Any]], mapping: dict[str, Any]) -> ImportContext:
-    ctx = ImportContext(mapping=mapping)
+def build_context(
+    rows: list[dict[str, Any]],
+    mapping: dict[str, Any],
+    session: Session,
+) -> ImportContext:
+    ctx = ImportContext(session=session, mapping=mapping)
 
     proposal_columns = get_entity_columns(mapping, "Proposal")
     detail_columns = get_entity_columns(mapping, "ProposalDetail")
@@ -197,8 +203,8 @@ def build_context(rows: list[dict[str, Any]], mapping: dict[str, Any]) -> Import
         main_contract_id = customer_data.get("main_contract_id")
         if not is_empty(main_contract_id):
             contract_id = int(main_contract_id)
-            if contract_id not in ctx.customers:
-                ctx.customers[contract_id] = {
+            if contract_id not in ctx.customer_rows:
+                ctx.customer_rows[contract_id] = {
                     "main_contract_id": contract_id,
                     "customer_reference": customer_data.get("customer_reference"),
                 }
@@ -208,8 +214,8 @@ def build_context(rows: list[dict[str, Any]], mapping: dict[str, Any]) -> Import
         recipient_name = recipient_data.get("recipient_name")
         if not is_empty(main_contract_id) and not is_empty(recipient_email):
             recipient_key = (int(main_contract_id), str(recipient_email))
-            if recipient_key not in ctx.customer_recipients:
-                ctx.customer_recipients[recipient_key] = {
+            if recipient_key not in ctx.recipient_rows:
+                ctx.recipient_rows[recipient_key] = {
                     "main_contract_id": int(main_contract_id),
                     "recipient_email": str(recipient_email),
                     "recipient_name": recipient_name,
@@ -218,20 +224,20 @@ def build_context(rows: list[dict[str, Any]], mapping: dict[str, Any]) -> Import
 
         product_name = lookup_values.get("Product", {}).get("product_name")
         if not is_empty(product_name):
-            ctx.products[str(product_name)] = {"product_name": str(product_name)}
+            ctx.product_rows[str(product_name)] = {"product_name": str(product_name)}
 
         proposal_type_name = lookup_values.get("ProposalType", {}).get("proposal_type_name")
         if not is_empty(proposal_type_name):
-            ctx.proposal_types[str(proposal_type_name)] = {
+            ctx.proposal_type_rows[str(proposal_type_name)] = {
                 "proposal_type_name": str(proposal_type_name)
             }
 
         team_name = lookup_values.get("Team", {}).get("team_name")
         if not is_empty(team_name):
-            ctx.teams[str(team_name)] = {"team_name": str(team_name)}
+            ctx.team_rows[str(team_name)] = {"team_name": str(team_name)}
 
         owner_name = lookup_values.get("Owner", {}).get("owner_name")
         if not is_empty(owner_name):
-            ctx.owners[str(owner_name)] = {"owner_name": str(owner_name)}
+            ctx.owner_rows[str(owner_name)] = {"owner_name": str(owner_name)}
 
     return ctx
