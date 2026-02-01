@@ -15,10 +15,10 @@ import Popper from '@mui/material/Popper';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 
 // project imports
 import MainCard from 'components/MainCard';
-import IconButton from 'components/@extended/IconButton';
 import Transitions from 'components/@extended/Transitions';
 
 // assets
@@ -68,7 +68,6 @@ export default function Notification() {
     <Box sx={{ flexShrink: 0, ml: 0.75 }}>
       <IconButton
         color="secondary"
-        variant="light"
         sx={(theme) => ({
           color: 'text.primary',
           bgcolor: open ? 'grey.100' : 'transparent',
@@ -94,7 +93,7 @@ export default function Notification() {
       >
         {({ TransitionProps }) => (
           <Transitions type="grow" position={downMD ? 'top' : 'top-right'} in={open} {...TransitionProps}>
-            <Paper sx={(theme) => ({ boxShadow: theme.customShadows.z1, width: '100%', minWidth: 285, maxWidth: { xs: 285, md: 420 } })}>
+            <Paper sx={(theme) => ({ boxShadow: theme.shadows[1], width: '100%', minWidth: 285, maxWidth: { xs: 285, md: 420 } })}>
               <ClickAwayListener onClickAway={handleClose}>
                 <MainCard
                   title="Notification"

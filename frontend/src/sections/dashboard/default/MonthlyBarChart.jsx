@@ -21,7 +21,7 @@ export default function MonthlyBarChart() {
       slotProps={{ bar: { rx: 5, ry: 5 } }}
       axisHighlight={{ x: 'none' }}
       margin={{ left: 20, right: 20 }}
-      colors={[theme.vars.palette.info.light]}
+      colors={[theme.palette.info.light]}
       sx={{
         '& .MuiBarElement-root:hover': { opacity: 0.6 },
         '& .MuiChartsAxis-root.MuiChartsAxis-directionX .MuiChartsAxis-tick': { stroke: 'transparent' }

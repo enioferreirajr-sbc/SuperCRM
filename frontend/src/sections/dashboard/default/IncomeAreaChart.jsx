@@ -2,15 +2,12 @@ import PropTypes from 'prop-types';
 import { useState } from 'react';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 
 import { LineChart } from '@mui/x-charts/LineChart';
-
-// project imports
-import { withAlpha } from 'utils/colorUtils';
 
 // Sample data
 const monthlyLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -56,7 +53,7 @@ export default function IncomeAreaChart({ view }) {
   const data1 = view === 'monthly' ? monthlyData1 : weeklyData1;
   const data2 = view === 'monthly' ? monthlyData2 : weeklyData2;
 
-  const line = theme.vars.palette.divider;
+  const line = theme.palette.divider;
 
   const toggleVisibility = (label) => {
     setVisibility((prev) => ({ ...prev, [label]: !prev[label] }));
@@ -69,7 +66,7 @@ export default function IncomeAreaChart({ view }) {
       showMark: false,
       area: true,
       id: 'page-views',
-      color: theme.vars.palette.primary.main || '',
+      color: theme.palette.primary.main || '',
       visible: visibility['Page views']
     },
     {
@@ -78,7 +75,7 @@ export default function IncomeAreaChart({ view }) {
       showMark: false,
       area: true,
       id: 'sessions',
-      color: theme.vars.palette.primary[700] || '',
+      color: theme.palette.primary.dark || '',
       visible: visibility['Sessions']
     }
   ];
@@ -115,12 +112,12 @@ export default function IncomeAreaChart({ view }) {
       >
         <defs>
           <linearGradient id="myGradient1" gradientTransform="rotate(90)">
-            <stop offset="10%" stopColor={withAlpha(theme.vars.palette.primary.main, 0.4)} />
-            <stop offset="90%" stopColor={withAlpha(theme.vars.palette.background.default, 0.4)} />
+            <stop offset="10%" stopColor={alpha(theme.palette.primary.main, 0.4)} />
+            <stop offset="90%" stopColor={alpha(theme.palette.background.default, 0.4)} />
           </linearGradient>
           <linearGradient id="myGradient2" gradientTransform="rotate(90)">
-            <stop offset="10%" stopColor={withAlpha(theme.vars.palette.primary[700], 0.4)} />
-            <stop offset="90%" stopColor={withAlpha(theme.vars.palette.background.default, 0.4)} />
+            <stop offset="10%" stopColor={alpha(theme.palette.primary.dark, 0.4)} />
+            <stop offset="90%" stopColor={alpha(theme.palette.background.default, 0.4)} />
           </linearGradient>
         </defs>
       </LineChart>

@@ -7,11 +7,11 @@ import Paper from '@mui/material/Paper';
 import Popper from '@mui/material/Popper';
 import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
+import IconButton from '@mui/material/IconButton';
 
 // project imports
 import Search from './Search';
 import Profile from './Profile';
-import IconButton from 'components/@extended/IconButton';
 import Transitions from 'components/@extended/Transitions';
 
 // assets
@@ -58,7 +58,6 @@ export default function MobileSection() {
           aria-haspopup="true"
           onClick={handleToggle}
           color="secondary"
-          variant="light"
         >
           <MoreOutlined />
         </IconButton>
@@ -84,7 +83,7 @@ export default function MobileSection() {
       >
         {({ TransitionProps }) => (
           <Transitions type="fade" in={open} {...TransitionProps}>
-            <Paper sx={(theme) => ({ boxShadow: theme.customShadows.z1 })}>
+            <Paper sx={(theme) => ({ boxShadow: theme.shadows[1] })}>
               <ClickAwayListener onClickAway={handleClose}>
                 <AppBar color="inherit">
                   <Toolbar>

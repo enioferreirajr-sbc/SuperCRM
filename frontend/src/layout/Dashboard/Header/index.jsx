@@ -4,11 +4,11 @@ import { useMemo } from 'react';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
+import IconButton from '@mui/material/IconButton';
 
 // project imports
 import AppBarStyled from './AppBarStyled';
 import HeaderContent from './HeaderContent';
-import IconButton from 'components/@extended/IconButton';
 
 import { handlerDrawerOpen, useGetMenuMaster } from 'api/menu';
 import { DRAWER_WIDTH, MINI_DRAWER_WIDTH } from 'config';
@@ -36,7 +36,6 @@ export default function Header() {
         onClick={() => handlerDrawerOpen(!drawerOpen)}
         edge="start"
         color="secondary"
-        variant="light"
         sx={(theme) => ({
           color: 'text.primary',
           bgcolor: drawerOpen ? 'transparent' : 'grey.100',

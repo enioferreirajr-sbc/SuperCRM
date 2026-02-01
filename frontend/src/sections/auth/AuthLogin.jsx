@@ -11,6 +11,7 @@ import Grid from '@mui/material/Grid';
 import Link from '@mui/material/Link';
 import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
+import IconButton from '@mui/material/IconButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -20,7 +21,6 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 
 // project imports
-import IconButton from 'components/@extended/IconButton';
 import AnimateButton from 'components/@extended/AnimateButton';
 
 // assets

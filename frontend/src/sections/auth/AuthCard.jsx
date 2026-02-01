@@ -19,7 +19,7 @@ export default function AuthCard({ children, ...other }) {
       {...other}
       border={false}
       boxShadow
-      shadow={theme.vars.customShadows.z1}
+      shadow={theme.shadows[1]}
     >
       <Box sx={{ p: { xs: 2, sm: 3, md: 4, xl: 5 } }}>{children}</Box>
     </MainCard>

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
+import { alpha, useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -11,8 +11,6 @@ import { BarChart } from '@mui/x-charts';
 
 // project imports
 import MainCard from 'components/MainCard';
-import { withAlpha } from 'utils/colorUtils';
-
 // ==============================|| SALES COLUMN CHART ||============================== //
 
 export default function SalesChart() {
@@ -39,10 +37,10 @@ export default function SalesChart() {
   };
 
   const valueFormatter = (value) => `$ ${value} Thousands`;
-  const primaryColor = theme.vars.palette.primary.main;
-  const primaryLightColor = theme.vars.palette.primary.lighter;
-  const warningColor = theme.vars.palette.warning.main;
-  const warningLightColor = theme.vars.palette.warning.lighter;
+  const primaryColor = theme.palette.primary.main;
+  const primaryLightColor = theme.palette.primary.light;
+  const warningColor = theme.palette.warning.main;
+  const warningLightColor = theme.palette.warning.light;
 
   const labels = ['07.06', '08.06', '09.06', '10.06', '11.06', '12.06', '13.06'];
 
@@ -119,7 +117,7 @@ export default function SalesChart() {
           ]}
           yAxis={[{ disableLine: true, tickSize: 7, tickMaxStep: 50 }]}
           series={initialSeries
-            .map((series) => ({ ...series, type: 'bar', color: withAlpha(series.color, 0.85), visible: seriesVisibility[series.label] }))
+            .map((series) => ({ ...series, type: 'bar', color: alpha(series.color, 0.85), visible: seriesVisibility[series.label] }))
             .filter((series) => series.visible)}
           highlightedItem={highlightedItem}
           slotProps={{ bar: { rx: 4, ry: 4 }, tooltip: { trigger: 'item' } }}
@@ -127,7 +125,7 @@ export default function SalesChart() {
           margin={{ top: 30, left: -5, bottom: 25, right: 10 }}
           sx={{
             '& .MuiBarElement-root:hover': { opacity: 0.6 },
-            '& .MuiChartsGrid-line': { strokeDasharray: '4 4', stroke: theme.vars.palette.divider },
+            '& .MuiChartsGrid-line': { strokeDasharray: '4 4', stroke: theme.palette.divider },
             '& .MuiBarElement-series-auto-generated-id-0, & .MuiBarElement-series-auto-generated-id-1': { width: 15 },
             '& .MuiChartsAxis-root.MuiChartsAxis-directionX .MuiChartsAxis-tick': { stroke: 'transparent' },
             '& .MuiChartsAxis-root.MuiChartsAxis-directionY .MuiChartsAxis-tick': { stroke: 'transparent' }
