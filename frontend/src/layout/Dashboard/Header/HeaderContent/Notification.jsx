@@ -19,7 +19,7 @@ import IconButton from '@mui/material/IconButton';
 
 // project imports
 import MainCard from 'components/MainCard';
-import Transitions from 'components/@extended/Transitions';
+import Transitions from 'components/Transitions';
 
 // assets
 import BellOutlined from '@ant-design/icons/BellOutlined';

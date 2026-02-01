@@ -8,6 +8,10 @@
 
 Mantis is a free and open source React dashboard template made using the Material UI React component library with aim of flexibility and better customizability.
 
+## Arquitetura de UI
+
+Toda decisão visual vive no ThemeProvider.
+
 ### Name Derived From Nature
 
 Mantis Logo is inspired from the insect name - 'Mantises' as they have triangular heads with flexible Necks. Also, the name is derived from two popular design systems, Material and Ant Design (M-Ant-is).

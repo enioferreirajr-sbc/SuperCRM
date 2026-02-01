@@ -22,7 +22,7 @@ import IconButton from '@mui/material/IconButton';
 import ProfileTab from './ProfileTab';
 import SettingTab from './SettingTab';
 import MainCard from 'components/MainCard';
-import Transitions from 'components/@extended/Transitions';
+import Transitions from 'components/Transitions';
 
 // assets
 import LogoutOutlined from '@ant-design/icons/LogoutOutlined';

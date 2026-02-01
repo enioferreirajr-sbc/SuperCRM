@@ -12,7 +12,7 @@ import IconButton from '@mui/material/IconButton';
 // project imports
 import Search from './Search';
 import Profile from './Profile';
-import Transitions from 'components/@extended/Transitions';
+import Transitions from 'components/Transitions';
 
 // assets
 import MoreOutlined from '@ant-design/icons/MoreOutlined';

@@ -20,7 +20,7 @@ import * as Yup from 'yup';
 import { Formik } from 'formik';
 
 // project imports
-import AnimateButton from 'components/@extended/AnimateButton';
+import AnimateButton from 'components/AnimateButton';
 
 import { strengthColor, strengthIndicator } from 'utils/password-strength';
 
