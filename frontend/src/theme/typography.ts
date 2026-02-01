@@ -1,88 +1,83 @@
-import type { TypographyOptions } from '@mui/material/styles/createTypography';
+import { ThemeOptions } from '@mui/material/styles';
 
 const pxToRem = (px: number) => `${px / 16}rem`;
-const ls = (px: number) => `${px / 16}rem`;
 
-export const typography: TypographyOptions = {
+const typography: ThemeOptions['typography'] = {
+  htmlFontSize: 16,
   fontFamily: "'Public Sans', 'Roboto', 'Helvetica', 'Arial', sans-serif",
+
   h1: {
-    fontSize: pxToRem(57),
-    lineHeight: pxToRem(64),
-    fontWeight: 400,
-    letterSpacing: ls(-0.25)
+    fontSize: pxToRem(32),
+    lineHeight: 1.25,
+    fontWeight: 400
   },
   h2: {
-    fontSize: pxToRem(45),
-    lineHeight: pxToRem(52),
-    fontWeight: 400,
-    letterSpacing: ls(0)
+    fontSize: pxToRem(28),
+    lineHeight: 1.3,
+    fontWeight: 400
   },
   h3: {
-    fontSize: pxToRem(36),
-    lineHeight: pxToRem(44),
-    fontWeight: 400,
-    letterSpacing: ls(0)
+    fontSize: pxToRem(24),
+    lineHeight: 1.3,
+    fontWeight: 400
   },
   h4: {
-    fontSize: pxToRem(32),
-    lineHeight: pxToRem(40),
-    fontWeight: 400,
-    letterSpacing: ls(0)
+    fontSize: pxToRem(20),
+    lineHeight: 1.35,
+    fontWeight: 400
   },
   h5: {
-    fontSize: pxToRem(28),
-    lineHeight: pxToRem(36),
-    fontWeight: 400,
-    letterSpacing: ls(0)
+    fontSize: pxToRem(18),
+    lineHeight: 1.4,
+    fontWeight: 400
   },
   h6: {
-    fontSize: pxToRem(24),
-    lineHeight: pxToRem(32),
-    fontWeight: 400,
-    letterSpacing: ls(0)
+    fontSize: pxToRem(16),
+    lineHeight: 1.4,
+    fontWeight: 400
   },
+
   subtitle1: {
-    fontSize: pxToRem(22),
-    lineHeight: pxToRem(28),
-    fontWeight: 400,
-    letterSpacing: ls(0)
+    fontSize: pxToRem(14),
+    lineHeight: 1.5,
+    fontWeight: 400
   },
   subtitle2: {
-    fontSize: pxToRem(16),
-    lineHeight: pxToRem(24),
-    fontWeight: 500,
-    letterSpacing: ls(0.15)
+    fontSize: pxToRem(13),
+    lineHeight: 1.45,
+    fontWeight: 500
   },
+
   body1: {
-    fontSize: pxToRem(16),
-    lineHeight: pxToRem(24),
-    fontWeight: 400,
-    letterSpacing: ls(0.5)
+    fontSize: pxToRem(14),
+    lineHeight: 1.5,
+    fontWeight: 400
   },
   body2: {
-    fontSize: pxToRem(14),
-    lineHeight: pxToRem(20),
-    fontWeight: 400,
-    letterSpacing: ls(0.25)
+    fontSize: pxToRem(13),
+    lineHeight: 1.45,
+    fontWeight: 400
   },
+
   button: {
-    fontSize: pxToRem(14),
-    lineHeight: pxToRem(20),
+    fontSize: pxToRem(13),
+    lineHeight: 1.5,
     fontWeight: 500,
-    letterSpacing: ls(0.1),
     textTransform: 'none'
   },
+
   caption: {
     fontSize: pxToRem(12),
-    lineHeight: pxToRem(16),
-    fontWeight: 400,
-    letterSpacing: ls(0.4)
+    lineHeight: 1.4,
+    fontWeight: 400
   },
+
   overline: {
     fontSize: pxToRem(11),
-    lineHeight: pxToRem(16),
+    lineHeight: 1.4,
     fontWeight: 500,
-    letterSpacing: ls(0.5),
     textTransform: 'uppercase'
   }
 };
+
+export default typography;

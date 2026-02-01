@@ -67,7 +67,7 @@ export default function ProposalDetailsModal({ open, proposalId, onClose }) {
   const totalGeral = items.reduce((sum, item) => sum + (Number(item.total_sales) || 0), 0);
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="md" fullWidth>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogTitle
         sx={{
           bgcolor: 'primary.main',
@@ -111,121 +111,123 @@ export default function ProposalDetailsModal({ open, proposalId, onClose }) {
               </Typography>
             )}
 
-            <Grid container spacing={2} sx={{ mb: 2 }}>
-              <Grid item xs={12} md={4}>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                  Etapa do funil
-                </Typography>
-                <Chip
-                  label={proposal?.funnel_percentage || '-'}
-                  color="primary"
-                  variant="outlined"
-                  sx={{ width: '100%' }}
-                />
+            <Grid container spacing={2}>
+              <Grid size={12}>
+                <Grid container spacing={2}>
+                  <Grid size={3}>
+                    <Chip
+                      label={proposal?.funnel_percentage || '-'}
+                      color="primary"
+                      variant="outlined"
+                      sx={{ width: '100%' }}
+                    />
+                  </Grid>
+
+                  <Grid size={3}>
+                    <Chip
+                      label={proposal?.proposal_status || '-'}
+                      color="primary"
+                      variant="outlined"
+                      sx={{ width: '100%' }}
+                    />
+                  </Grid>
+
+                  <Grid size={3}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      disabled
+                      label="Data da proposta"
+                      value={formatDate(proposal?.business_proposal_date)}
+                      InputLabelProps={{ shrink: true }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <CalendarMonthIcon />
+                          </InputAdornment>
+                        )
+                      }}
+                    />
+                  </Grid>
+
+                  <Grid size={3}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      disabled
+                      label="Data do status"
+                      value={formatDate(proposal?.last_status_date)}
+                      InputLabelProps={{ shrink: true }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <UpdateIcon />
+                          </InputAdornment>
+                        )
+                      }}
+                    />
+                  </Grid>
+                </Grid>
               </Grid>
 
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  disabled
-                  label="Data da proposta"
-                  value={formatDate(proposal?.business_proposal_date)}
-                  InputLabelProps={{ shrink: true }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <CalendarMonthIcon />
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              </Grid>
+              <Grid size={12}>
+                <Grid container spacing={2}>
+                  <Grid size={3}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      disabled
+                      label="Contato"
+                      value={proposal?.recipient_name || '-'}
+                      InputLabelProps={{ shrink: true }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <PersonIcon />
+                          </InputAdornment>
+                        )
+                      }}
+                    />
+                  </Grid>
 
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  disabled
-                  label="Data do status"
-                  value={formatDate(proposal?.last_status_date)}
-                  InputLabelProps={{ shrink: true }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <UpdateIcon />
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              </Grid>
+                  <Grid size={3}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      disabled
+                      label="E-mail"
+                      value={proposal?.recipient_email || '-'}
+                      InputLabelProps={{ shrink: true }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start">
+                            <EmailIcon />
+                          </InputAdornment>
+                        )
+                      }}
+                    />
+                  </Grid>
 
-              <Grid item xs={12} md={12}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  disabled
-                  label="Último comentário"
-                  value={proposal?.last_note || '-'}
-                  multiline
-                  minRows={2}
-                  InputLabelProps={{ shrink: true }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1 }}>
-                        <CommentIcon />
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  disabled
-                  label="Contato"
-                  value={proposal?.recipient_name || '-'}
-                  InputLabelProps={{ shrink: true }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <PersonIcon />
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <TextField
-                  fullWidth
-                  size="small"
-                  disabled
-                  label="E-mail"
-                  value={proposal?.recipient_email || '-'}
-                  InputLabelProps={{ shrink: true }}
-                  InputProps={{
-                    startAdornment: (
-                      <InputAdornment position="start">
-                        <EmailIcon />
-                      </InputAdornment>
-                    )
-                  }}
-                />
-              </Grid>
-
-              <Grid item xs={12} md={4}>
-                <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
-                  Status
-                </Typography>
-                <Chip
-                  label={proposal?.proposal_status || '-'}
-                  color="primary"
-                  variant="outlined"
-                  sx={{ width: '100%' }}
-                />
+                  <Grid size={6}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      disabled
+                      label="Último comentário"
+                      value={proposal?.last_note || '-'}
+                      multiline
+                      minRows={2}
+                      InputLabelProps={{ shrink: true }}
+                      InputProps={{
+                        startAdornment: (
+                          <InputAdornment position="start" sx={{ alignSelf: 'flex-start', mt: 1 }}>
+                            <CommentIcon />
+                          </InputAdornment>
+                        )
+                      }}
+                    />
+                  </Grid>
+                </Grid>
               </Grid>
             </Grid>
 
