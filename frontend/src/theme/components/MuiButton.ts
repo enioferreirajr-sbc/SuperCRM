@@ -1,6 +1,6 @@
 import type { Components, Theme } from '@mui/material/styles';
 
-export function button(theme: Theme): Components {
+export function muiButton(theme: Theme): Components {
   return {
     MuiButton: {
       defaultProps: {
