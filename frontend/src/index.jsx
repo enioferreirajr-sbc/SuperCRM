@@ -16,10 +16,14 @@ import '@fontsource/public-sans/500.css';
 import '@fontsource/public-sans/600.css';
 import '@fontsource/public-sans/700.css';
 
+import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+
 // project imports
 import App from './App';
 import { ConfigProvider } from 'contexts/ConfigContext';
 import reportWebVitals from './reportWebVitals';
+import { theme } from './theme';
 
 const container = document.getElementById('root');
 const root = createRoot(container);
@@ -27,9 +31,14 @@ const root = createRoot(container);
 // ==============================|| MAIN - REACT DOM RENDER ||============================== //
 
 root.render(
-  <ConfigProvider>
-    <App />
-  </ConfigProvider>
+  <StyledEngineProvider injectFirst>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <ConfigProvider>
+        <App />
+      </ConfigProvider>
+    </ThemeProvider>
+  </StyledEngineProvider>
 );
 
 // If you want to start measuring performance in your app, pass a function

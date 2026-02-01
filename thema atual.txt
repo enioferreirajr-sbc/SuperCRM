@@ -1,0 +1,44 @@
+
+O projeto utiliza a biblioteca **Material UI (MUI)** como base. Abaixo está o detalhamento de como a parte visual funciona:
+
+### 1. Ponto de Entrada Global (`App.jsx`)
+
+O tema é aplicado em toda a aplicação através do componente `ThemeCustomization`. Ele envolve toda a estrutura de rotas, garantindo que qualquer componente interno tenha acesso às definições de estilo globais.
+
+### 2. Centralização do Tema (`themes/index.jsx`)
+
+Este é o arquivo "mestre" do visual. Ele utiliza o `createTheme` do Material UI para consolidar diferentes configurações:
+
+* **Configurações de Layout**: Define pontos de interrupção (*breakpoints*) específicos (ex: `sm: 768`, `md: 1024`) e dimensões da barra de ferramentas.
+* **Modo de Cor**: Está configurado por padrão para o modo claro (`light`), utilizando variáveis de CSS para gerenciar esquemas de cores.
+* **Provedores**: Utiliza o `ThemeProvider` e o `StyledEngineProvider` (com `injectFirst`) para garantir que os estilos do projeto tenham prioridade sobre os estilos padrão do MUI.
+
+### 3. Organização Modular (Arquivos Específicos)
+
+Embora o tema seja global, ele é construído a partir de arquivos especializados para facilitar a manutenção:
+
+* **Paleta de Cores (`themes/palette.js`)**:
+* Constrói as cores dinamicamente com base em presets (como os da biblioteca Ant Design).
+* Define cores primárias, secundárias e uma escala de cinzas personalizada (`buildGrey`).
+* Configura cores específicas para fundo (*background*), divisores e estados de texto.
+
+
+* **Tipografia (`themes/typography.js`)**:
+* Define a família de fontes global (vinda das configurações do usuário) e estabelece tamanhos, pesos e alturas de linha para todos os níveis de títulos (`h1` a `h6`), subtítulos e corpo de texto.
+
+
+* **Sombras Customizadas (`themes/custom-shadows.jsx`)**:
+* Cria sombras personalizadas (ex: `z1`, `primaryButton`) que não existem no tema padrão do MUI, integrando-as com as cores da paleta.
+
+
+
+### 4. Sobrescrita de Componentes (`themes/overrides/`)
+
+O projeto adota uma estratégia de **arquivos individuais para cada componente**. Em vez de estilizar cada botão ou tabela manualmente no código da página, o projeto define um comportamento visual padrão no diretório `overrides`.
+
+* O arquivo `overrides/index.js` importa e combina (através da função `merge`) as customizações de diversos elementos, como `Button`, `Checkbox`, `Table`, `Tabs`, entre outros.
+* Isso significa que existe um arquivo específico para ditar o visual de cada componente Material UI usado no sistema, garantindo consistência visual em toda a plataforma.
+
+### Resumo
+
+O projeto não estiliza componentes de forma isolada em cada arquivo de funcionalidade. Ele possui um **Tema Global** altamente customizado, onde a lógica de cores e fontes é centralizada, enquanto o design detalhado de cada componente (como bordas de botões ou cores de tabelas) é delegado a arquivos específicos dentro da pasta de `overrides`.
