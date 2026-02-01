@@ -1,8 +1,5 @@
 import { createRoot } from 'react-dom/client';
 
-// style.scss
-import 'assets/style.css';
-
 // scroll bar
 import 'simplebar-react/dist/simplebar.min.css';
 
